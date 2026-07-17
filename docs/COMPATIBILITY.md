@@ -45,6 +45,8 @@ Estado: **pendiente; bloqueo consciente**. No se creó código en Fase 1.
 
 Criterio de salida: todos los pasos aprobados. Si SQLCipher o cualquier dependencia falla ARMv7, se reemplaza o se adopta cifrado de campos completo antes de implementar dominio.
 
+Esta puerta confirma que el stack puede compilar y ejecutar sus primitivas. No equivale todavía a aceptar la compatibilidad integral del producto, porque los flujos de gestión y exportación se implementan en fases posteriores.
+
 ## Presupuestos iniciales medibles
 
 Se confirmarán en los dispositivos de referencia; son umbrales de aceptación, no resultados medidos:
@@ -55,7 +57,7 @@ Se confirmarán en los dispositivos de referencia; son umbrales de aceptación, 
 | Inicio frío ARM64/iPhone compatible | p95 ≤ 2.0 s |
 | Entrada/salida confirmada localmente | p95 ≤ 250 ms |
 | Inicio/fin de pausa | p95 ≤ 250 ms |
-| Frames lentos en flujo principal | < 5% |
+| Fluidez en pantallas principales a 60 Hz | p95 de frame ≤ 16.7 ms cuando el dispositivo lo permita; frames lentos < 5% |
 | RSS estable en ARMv7 durante fichaje/calendario | ≤ 180 MB |
 | Aumento de RSS tras 20 ciclos de navegación | ≤ 15 MB |
 | APK por ABI release comprimido | ≤ 35 MB |
@@ -74,6 +76,22 @@ Se medirán al menos 20 corridas de inicio y 100 operaciones de fichaje después
 - iPhone actual con iOS 26.
 
 Emuladores sirven para matriz funcional, no para aceptar memoria, biometría, almacenamiento, batería ni ARMv7.
+
+## Aceptación final de ARM de 32 bits
+
+La declaración pública de compatibilidad solo podrá realizarse al final de las fases funcionales cuando, en un dispositivo ARMv7 físico:
+
+- exista un APK exclusivo `armeabi-v7a` y se instale sin errores de carga nativa;
+- la aplicación abra, cierre y vuelva a abrir después de reiniciar el dispositivo;
+- se pueda crear, pausar, reanudar y finalizar una jornada sin duplicados;
+- se pueda crear y editar un registro, conservando su revisión;
+- SQLite ejecute migraciones, consultas y transacciones correctamente;
+- AES-GCM y, si se conserva, SQLCipher cifren, autentiquen y descifren correctamente;
+- una exportación CSV extensa se complete y pueda compartirse;
+- los flujos principales permanezcan dentro del presupuesto de memoria sin cierres;
+- almacenamiento lento, modo ahorro de batería y cierre del proceso no corrompan el estado.
+
+Compilar el APK sin ejecutar esta lista no constituye aceptación.
 
 ## Reglas de rendimiento
 

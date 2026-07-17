@@ -1,0 +1,17 @@
+node_modules/
+.pnpm-store/
+.expo/
+dist/
+coverage/
+android/
+ios/
+*.jks
+*.keystore
+*.mobileprovision
+*.p8
+*.p12
+*.key
+.env
+.env.*
+!/.env.example
+_expo_scaffold/

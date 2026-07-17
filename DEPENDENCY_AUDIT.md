@@ -26,6 +26,20 @@ Antes de aceptar una dependencia se registra: función nativa equivalente, códi
 | Jest + React Native Testing Library | Unitarias/componentes | Solo desarrollo | Offline / no | Configuración compatible Expo 55 |
 | Maestro | E2E en builds reales, ya presente en imagen EAS | Herramienta externa | Puede operar local | Probar ARMv7 con hardware conectado |
 
+## Ficha obligatoria de candidatos nativos
+
+Esta tabla registra lo comprobable antes de instalar. Los deltas de tamaño y memoria no se estiman: se obtendrán comparando artefactos release idénticos, con y sin cada módulo, durante el spike.
+
+| Módulo | Android mínimo / iOS mínimo | ABIs requeridas | Tamaño agregado | Memoria aproximada | Nueva arquitectura | Google Play Services | Estado ARM de 32 bits |
+| --- | --- | --- | ---: | ---: | --- | --- | --- |
+| Base Expo 55 / RN 0.83 | API 24 / iOS 15.1 | ARMv7, ARM64 | Pendiente de medición | Pendiente de medición | React Native 0.83 usa la arquitectura soportada por Expo 55 | No | Documentado en configuración; artefacto y dispositivo pendientes |
+| `expo-sqlite` + SQLCipher | API 24 / iOS 15.1 por matriz Expo | ARMv7, ARM64 | Pendiente de medición aislada | Pendiente, incluyendo consulta de 10 años | Módulo Expo compatible con la base elegida | No | Crítico: inspección ELF, apertura y CRUD pendientes |
+| `expo-secure-store` | API 24 / iOS 15.1 por matriz Expo | ARMv7, ARM64 | Pendiente de medición aislada | Pendiente | Módulo Expo compatible con la base elegida | No | Lectura/escritura y reinicio pendientes en ARMv7 |
+| `expo-crypto` | API 24 / iOS 15.1 por matriz Expo | ARMv7, ARM64 | Pendiente de medición aislada | Pendiente, con lotes AES-GCM | Módulo Expo compatible con la base elegida | No | AES-GCM, manipulación y rendimiento pendientes en ARMv7 |
+| `expo-local-authentication` | API 24 / iOS 15.1 por matriz Expo | ARMv7, ARM64 | Pendiente en Fase 7 | Pendiente en Fase 7 | Módulo Expo compatible con la base elegida | No | No se acepta hasta probar hardware biométrico ARMv7/ARM64 |
+
+Todos funcionan offline en su flujo previsto y no se incorporará Google Play Services. La ausencia de telemetría, la licencia exacta y el estado de mantenimiento se verificarán sobre la versión resuelta en el lockfile, no sobre el nombre genérico del paquete.
+
 Todas las licencias deberán registrarse con versión exacta en Fase 2; se aceptan inicialmente paquetes del ecosistema Expo/React con licencias permisivas, sujetos a verificación automática del árbol transitivo.
 
 ## Paquetes deliberadamente no elegidos
@@ -39,7 +53,17 @@ Todas las licencias deberán registrarse con versión exacta en Fase 2; se acept
 
 ## Dependencias aplazadas
 
-XLSX, PDF, KDF de backup/PIN y procesamiento en segundo plano se auditarán justo antes de sus fases. No se seleccionan ahora porque sus tamaños y ABIs pueden cambiar y no son necesarias para Fases 2–5. Se preferirán generación incremental y APIs Expo/nativas; ninguna se incorporará sin APK ARMv7.
+Durante la Fase 1 se aplazaron XLSX, KDF de backup/PIN y procesamiento en segundo plano. Las ya seleccionadas en Fases 6–7 figuran a continuación; cualquier dependencia futura seguirá prefiriendo APIs Expo/nativas y no se aceptará definitivamente sin prueba ARMv7.
+
+## Decisiones incorporadas en Fases 6–7
+
+| Paquete | Versión | Decisión | Código nativo / ABI | Licencia y telemetría | Impacto pendiente |
+| --- | ---: | --- | --- | --- | --- |
+| `exceljs` | 4.4.0 | Generación XLSX con hojas, formatos y encabezados; importación dinámica dentro del flujo de exportación | No | MIT; sin telemetría | Medir memoria y delta del bundle en ARMv7; el XLSX se construye en memoria |
+| `buffer` | 6.0.3 | Conversión del `ArrayBuffer` XLSX y Base64 de backup | No | MIT; sin telemetría | Pequeño; cuantificar en APK |
+| `@noble/hashes` | 2.2.0 | PBKDF2-HMAC-SHA256 auditado, cero dependencias y *tree-shakeable* | No | MIT; sin telemetría | Medir 600.000 iteraciones en ARMv7 y ajustar solo con revisión de seguridad |
+
+Estas dependencias funcionan offline, no requieren Google Play Services ni modifican la matriz ABI. ExcelJS es el principal riesgo de memoria de Fase 6; la aceptación exige medir exportaciones de diez años en el dispositivo de referencia.
 
 ## Plantilla de aceptación
 
